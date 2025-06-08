@@ -1,0 +1,200 @@
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  color: white;
+}
+
+.stocks-container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 20px 0;
+  padding: 20px;
+  background-color: #3b4048;
+  border-radius: 8px;
+}
+
+.news-container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 20px 0;
+  padding: 20px;
+  background-color: #3b4048;
+  border-radius: 8px;
+}
+
+.news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.news-card {
+  background-color: #282c34;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.news-card h3 {
+  margin: 0 0 10px 0;
+  color: #61dafb;
+}
+
+.news-card p {
+  margin: 0 0 15px 0;
+  line-height: 1.5;
+}
+
+.news-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sentiment-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+}
+
+.read-more {
+  color: #61dafb;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.read-more:hover {
+  text-decoration: underline;
+}
+
+.stocks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.stock-card {
+  background-color: #282c34;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.stock-card:hover {
+  transform: translateY(-5px);
+}
+
+.stock-card h3 {
+  margin: 0 0 10px 0;
+  color: #61dafb;
+}
+
+.stock-price {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.stock-time {
+  font-size: 12px;
+  color: #888;
+}
+
+.food-form {
+  margin: 20px 0;
+  display: flex;
+  gap: 10px;
+}
+
+.food-input {
+  padding: 8px 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  width: 200px;
+}
+
+.add-button {
+  padding: 8px 16px;
+  font-size: 16px;
+  background-color: #61dafb;
+  border: none;
+  border-radius: 4px;
+  color: #282c34;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add-button:hover {
+  background-color: #4fa8c7;
+}
+
+.content-container {
+  display: flex;
+  gap: 40px;
+  margin-top: 20px;
+  width: 100%;
+  max-width: 800px;
+}
+
+.food-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 300px;
+}
+
+.food-item {
+  background-color: #3b4048;
+  padding: 12px;
+  border-radius: 4px;
+  text-align: left;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.food-item:hover {
+  transform: translateX(5px);
+  background-color: #4a4f58;
+}
+
+.food-item.selected {
+  background-color: #61dafb;
+  color: #282c34;
+}
+
+.explanation-container {
+  flex: 1;
+  background-color: #3b4048;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.explanation-container h2 {
+  margin-top: 0;
+  color: #61dafb;
+}
+
+.explanation {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.loading {
+  color: #61dafb;
+  font-style: italic;
+} 
