@@ -18,7 +18,7 @@ CORS(app)
 # Initialize scheduler
 scheduler = BackgroundScheduler()
 scheduler.add_job(update_stock_prices, 'interval', minutes=120)
-scheduler.add_job(update_news, 'interval', minutes=60)
+scheduler.add_job(update_news, 'interval', minutes=600)
 scheduler.start()
 
 @app.route('/api/foods', methods=['GET'])

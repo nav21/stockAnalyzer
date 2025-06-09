@@ -21,7 +21,6 @@ class News(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String)
-    description = Column(Text)
+    content = Column(Text)
     url = Column(String)
-    sentiment = Column(String)  # positive, negative, or neutral
     timestamp = Column(DateTime, default=datetime.utcnow) 

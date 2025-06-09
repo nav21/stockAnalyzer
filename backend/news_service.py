@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from config import SessionLocal
 import models
-from marketaux_config import get_apple_news
+from eodhd_config import get_apple_news
+from datetime import datetime
 
 def update_news():
     """Fetch and update news about Apple."""
@@ -13,9 +14,9 @@ def update_news():
             # Create new news record
             news_record = models.News(
                 title=item['title'],
-                description=item.get('description', ''),
-                url=item['url'],
-                sentiment=item.get('sentiment', 'neutral')
+                content=item.get('content', ''),
+                url=item['link'],
+                timestamp=datetime.fromisoformat(item['date'])
             )
             db.add(news_record)
         
@@ -30,13 +31,12 @@ def get_latest_news(db: Session):
     """Get the latest news items."""
     news = db.query(models.News)\
         .order_by(models.News.timestamp.desc())\
-        .limit(2)\
+        .limit(5)\
         .all()
     
     return [{
         'title': item.title,
-        'description': item.description,
+        'content': item.content,
         'url': item.url,
-        'sentiment': item.sentiment,
         'timestamp': item.timestamp.isoformat()
     } for item in news] 

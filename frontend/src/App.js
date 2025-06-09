@@ -117,32 +117,32 @@ function App() {
         </div>
 
         <div className="news-container">
-          <h2>Latest Apple News</h2>
-          <div className="news-list">
-            {news.map((item, index) => (
-              <div key={index} className="news-card">
-                <h3>{item.title}</h3>
-                <p>{item.description}</p>
-                <div className="news-footer">
-                  <span 
-                    className="sentiment-badge"
-                    style={{ backgroundColor: getSentimentColor(item.sentiment) }}
-                  >
-                    {item.sentiment}
-                  </span>
-                  <a 
-                    href={item.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="read-more"
-                  >
-                    Read More
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
+  <h2>Latest Apple News</h2>
+  <div className="news-list">
+    {news.map((item, index) => (
+      <div key={index} className="news-card">
+        <h3>{item.title}</h3>
+        {/* Changed 'item.description' to 'item.content' */}
+        <p>{item.content}</p>
+        <div className="news-footer">
+          {/* Removed sentiment badge as requested */}
+          <a
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="read-more"
+          >
+            Read More
+          </a>
+          {/* You might want to add the timestamp here if you want to display it */}
+          <span className="news-timestamp">
+            {item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'}
+          </span>
         </div>
+      </div>
+    ))}
+  </div>
+</div>
 
         <form onSubmit={handleSubmit} className="food-form">
           <input
