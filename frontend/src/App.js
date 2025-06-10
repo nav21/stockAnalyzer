@@ -3,16 +3,13 @@ import axios from 'axios';
 import './App.css';
 
 function App() {
-  const [foods, setFoods] = useState([]);
-  const [newFood, setNewFood] = useState('');
-  const [selectedFood, setSelectedFood] = useState(null);
-  const [explanation, setExplanation] = useState('');
-  const [loading, setLoading] = useState(false);
   const [stocks, setStocks] = useState({});
   const [news, setNews] = useState([]);
+  const [question, setQuestion] = useState('');
+  const [analysis, setAnalysis] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   useEffect(() => {
-    fetchFoods();
     fetchStocks();
     fetchNews();
     // Set up intervals
@@ -23,15 +20,6 @@ function App() {
       clearInterval(newsInterval);
     };
   }, []);
-
-  const fetchFoods = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/api/foods');
-      setFoods(response.data);
-    } catch (error) {
-      console.error('Error fetching foods:', error);
-    }
-  };
 
   const fetchStocks = async () => {
     try {
@@ -51,28 +39,21 @@ function App() {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleQuestionSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await axios.post('http://localhost:5000/api/foods', { name: newFood });
-      setNewFood('');
-      fetchFoods();
-    } catch (error) {
-      console.error('Error adding food:', error);
-    }
-  };
+    if (!question.trim()) return;
 
-  const handleFoodClick = async (food) => {
-    setSelectedFood(food);
-    setLoading(true);
+    setIsAnalyzing(true);
     try {
-      const response = await axios.get(`http://localhost:5000/api/foods/${food.id}/explanation`);
-      setExplanation(response.data.explanation);
+      const response = await axios.post('http://localhost:5000/api/analyze', {
+        question: question
+      });
+      setAnalysis(response.data.analysis);
     } catch (error) {
-      console.error('Error fetching explanation:', error);
-      setExplanation('Error getting explanation');
+      console.error('Error getting analysis:', error);
+      setAnalysis('Error getting analysis. Please try again.');
     } finally {
-      setLoading(false);
+      setIsAnalyzing(false);
     }
   };
 
@@ -87,21 +68,10 @@ function App() {
     return new Date(timestamp).toLocaleTimeString();
   };
 
-  const getSentimentColor = (sentiment) => {
-    switch (sentiment.toLowerCase()) {
-      case 'positive':
-        return '#4caf50';
-      case 'negative':
-        return '#f44336';
-      default:
-        return '#9e9e9e';
-    }
-  };
-
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Food List & Stock Prices</h1>
+        <h1>Stock Prices & News</h1>
         
         <div className="stocks-container">
           <h2>Stock Prices</h2>
@@ -117,65 +87,48 @@ function App() {
         </div>
 
         <div className="news-container">
-  <h2>Latest Apple News</h2>
-  <div className="news-list">
-    {news.map((item, index) => (
-      <div key={index} className="news-card">
-        <h3>{item.title}</h3>
-        {/* Changed 'item.description' to 'item.content' */}
-        <p>{item.content}</p>
-        <div className="news-footer">
-          {/* Removed sentiment badge as requested */}
-          <a
-            href={item.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="read-more"
-          >
-            Read More
-          </a>
-          {/* You might want to add the timestamp here if you want to display it */}
-          <span className="news-timestamp">
-            {item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'}
-          </span>
-        </div>
-      </div>
-    ))}
-  </div>
-</div>
-
-        <form onSubmit={handleSubmit} className="food-form">
-          <input
-            type="text"
-            value={newFood}
-            onChange={(e) => setNewFood(e.target.value)}
-            placeholder="Enter food name"
-            className="food-input"
-          />
-          <button type="submit" className="add-button">Add Food</button>
-        </form>
-
-        <div className="content-container">
-          <div className="food-list">
-            {foods.map((food) => (
-              <div
-                key={food.id}
-                className={`food-item ${selectedFood?.id === food.id ? 'selected' : ''}`}
-                onClick={() => handleFoodClick(food)}
-              >
-                {food.name}
+          <h2>Latest Apple News</h2>
+          <div className="news-list">
+            {news.map((item, index) => (
+              <div key={index} className="news-card">
+                <h3>{item.title}</h3>
+                <p>{item.content}</p>
+                <div className="news-footer">
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="read-more"
+                  >
+                    Read More
+                  </a>
+                  <span className="news-timestamp">
+                    {item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
+        </div>
 
-          {selectedFood && (
-            <div className="explanation-container">
-              <h2>{selectedFood.name}</h2>
-              {loading ? (
-                <div className="loading">Loading explanation...</div>
-              ) : (
-                <p className="explanation">{explanation}</p>
-              )}
+        <div className="analysis-container">
+          <h2>Ask About Apple's Stock</h2>
+          <form onSubmit={handleQuestionSubmit} className="question-form">
+            <input
+              type="text"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="Ask about Apple's stock price movement..."
+              className="question-input"
+            />
+            <button type="submit" className="analyze-button" disabled={isAnalyzing}>
+              {isAnalyzing ? 'Analyzing...' : 'Analyze'}
+            </button>
+          </form>
+          {analysis && (
+            <div className="analysis-result">
+              <h3>Analysis</h3>
+              <p>{analysis}</p>
             </div>
           )}
         </div>

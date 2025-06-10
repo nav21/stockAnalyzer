@@ -3,9 +3,9 @@ from flask_cors import CORS
 from sqlalchemy.orm import Session
 from config import engine, get_db
 import models
-from openai_config import get_food_explanation
-from stock_service import update_stock_prices, get_latest_prices
+from stock_service import update_stock_prices, get_latest_prices, get_latest_ten_prices
 from news_service import update_news, get_latest_news
+from gemini_config import get_stock_analysis
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 
@@ -17,50 +17,9 @@ CORS(app)
 
 # Initialize scheduler
 scheduler = BackgroundScheduler()
-scheduler.add_job(update_stock_prices, 'interval', minutes=120)
+scheduler.add_job(update_stock_prices, 'interval', minutes=300)
 scheduler.add_job(update_news, 'interval', minutes=600)
 scheduler.start()
-
-@app.route('/api/foods', methods=['GET'])
-def get_foods():
-    db: Session = next(get_db())
-    try:
-        foods = db.query(models.Food).all()
-        return jsonify([{"id": food.id, "name": food.name} for food in foods])
-    finally:
-        db.close()
-
-@app.route('/api/foods', methods=['POST'])
-def create_food():
-    db: Session = next(get_db())
-    try:
-        food_data = request.get_json()
-        if not food_data or 'name' not in food_data:
-            return jsonify({"error": "Name is required"}), 400
-
-        new_food = models.Food(name=food_data['name'])
-        db.add(new_food)
-        db.commit()
-        db.refresh(new_food)
-        return jsonify({"id": new_food.id, "name": new_food.name}), 201
-    except Exception as e:
-        db.rollback()
-        return jsonify({"error": str(e)}), 500
-    finally:
-        db.close()
-
-@app.route('/api/foods/<int:food_id>/explanation', methods=['GET'])
-def get_food_explanation_endpoint(food_id):
-    db: Session = next(get_db())
-    try:
-        food = db.query(models.Food).filter(models.Food.id == food_id).first()
-        if not food:
-            return jsonify({"error": "Food not found"}), 404
-        
-        explanation = get_food_explanation(food.name)
-        return jsonify({"explanation": explanation})
-    finally:
-        db.close()
 
 @app.route('/api/stocks', methods=['GET'])
 def get_stocks():
@@ -77,6 +36,26 @@ def get_news():
     try:
         news = get_latest_news(db)
         return jsonify(news)
+    finally:
+        db.close()
+
+@app.route('/api/analyze', methods=['POST'])
+def analyze_stock():
+    db: Session = next(get_db())
+    try:
+        question = request.json.get('question')
+        if not question:
+            return jsonify({"error": "Question is required"}), 400
+
+        # Get latest data
+        stock_data = get_latest_ten_prices(db)
+        news_data = get_latest_news(db)
+
+        # Get analysis from Gemini
+        analysis = get_stock_analysis(question, stock_data, news_data)
+        return jsonify({"analysis": analysis})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     finally:
         db.close()
 

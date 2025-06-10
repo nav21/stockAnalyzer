@@ -18,8 +18,16 @@ def get_stock_price(symbol):
         }
         
         response = requests.get(BASE_URL, params=params)
+  # --- ADDED DEBUGGING PRINTS ---
+        print(f"DEBUG: Alpha Vantage Response Status Code: {response.status_code}")
+        print(f"DEBUG: Alpha Vantage Raw Response Text: {response.text}")
+        # --- END ADDED DEBUGGING PRINTS ---
+
         data = response.json()
         
+        # --- ADDED DEBUGGING PRINT ---
+        print(f"DEBUG: Alpha Vantage Parsed JSON Data: {data}")
+        # --- END ADDED DEBUGGING PRINT ---        
         if 'Global Quote' in data:
             return float(data['Global Quote']['05. price'])
         else:
