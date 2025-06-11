@@ -8,6 +8,7 @@ function App() {
   const [question, setQuestion] = useState('');
   const [analysis, setAnalysis] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showData, setShowData] = useState(false);
 
   useEffect(() => {
     fetchStocks();
@@ -71,45 +72,56 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Stock Prices & News</h1>
+        <h1>Stock Analysis</h1>
         
-        <div className="stocks-container">
-          <h2>Stock Prices</h2>
-          <div className="stocks-grid">
-            {Object.entries(stocks).map(([symbol, data]) => (
-              <div key={symbol} className="stock-card">
-                <h3>{symbol}</h3>
-                <div className="stock-price">{formatPrice(data.price)}</div>
-                <div className="stock-time">Updated: {formatTime(data.timestamp)}</div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <button 
+          className="toggle-button"
+          onClick={() => setShowData(!showData)}
+        >
+          {showData ? 'Hide Data' : 'Show Data'}
+        </button>
 
-        <div className="news-container">
-          <h2>Latest Apple News</h2>
-          <div className="news-list">
-            {news.map((item, index) => (
-              <div key={index} className="news-card">
-                <h3>{item.title}</h3>
-                <p>{item.content}</p>
-                <div className="news-footer">
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="read-more"
-                  >
-                    Read More
-                  </a>
-                  <span className="news-timestamp">
-                    {item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'}
-                  </span>
-                </div>
+        {showData && (
+          <>
+            <div className="stocks-container">
+              <h2>Stock Prices</h2>
+              <div className="stocks-grid">
+                {Object.entries(stocks).map(([symbol, data]) => (
+                  <div key={symbol} className="stock-card">
+                    <h3>{symbol}</h3>
+                    <div className="stock-price">{formatPrice(data.price)}</div>
+                    <div className="stock-time">Updated: {formatTime(data.timestamp)}</div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
+
+            <div className="news-container">
+              <h2>Latest Apple News</h2>
+              <div className="news-list">
+                {news.map((item, index) => (
+                  <div key={index} className="news-card">
+                    <h3>{item.title}</h3>
+                    <p>{item.content}</p>
+                    <div className="news-footer">
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="read-more"
+                      >
+                        Read More
+                      </a>
+                      <span className="news-timestamp">
+                        {item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
 
         <div className="analysis-container">
           <h2>Ask About Apple's Stock</h2>

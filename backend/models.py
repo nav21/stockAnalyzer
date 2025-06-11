@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, Text
+from sqlalchemy import Column, Integer, String, Float, DateTime, Text, UniqueConstraint
 from config import Base
 from datetime import datetime
 
@@ -14,7 +14,7 @@ class News(Base):
     __tablename__ = "news"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String)
+    title = Column(String, unique=True, index=True)
     content = Column(Text)
     url = Column(String)
     timestamp = Column(DateTime, default=datetime.utcnow) 

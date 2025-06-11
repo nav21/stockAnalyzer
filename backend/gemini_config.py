@@ -64,7 +64,6 @@ def get_stock_analysis(question, stock_data, news_data):
                 if newest_date_str is None or current_date_str > newest_date_str:
                     newest_date_str = current_date_str
 
-                # Corrected f-string formatting for price and timestamp
                 stock_prices_detail.append(f"  Price: ${price_record['price']:.2f} (As of: {price_record['timestamp']})")
             except ValueError:
                 stock_prices_detail.append(f"  Price: ${price_record.get('price', 'N/A'):.2f} (As of: Invalid Date)")
@@ -92,15 +91,13 @@ def get_stock_analysis(question, stock_data, news_data):
         """
 
         # Initialize the model
-        model = genai.GenerativeModel('gemini-2.0-flash-lite')
+        model = genai.GenerativeModel('gemini-1.5-flash-8b')
         
         # Generate response
         response = model.generate_content(
             f"""You are a financial analyst assistant. Based on the provided stock price history and recent news, 
             answer the following question about {symbol}'s stock price movement. 
-            Be concise and focus on the most relevant information. 
-            Crucially, explicitly mention the exact date range of the stock price data you are analyzing (e.g., "from YYYY-MM-DD to YYYY-MM-DD") 
-            at the beginning of your analysis.
+            Be concise and focus on the most relevant information.
             
             Context:
             {context}
