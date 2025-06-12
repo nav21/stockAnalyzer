@@ -34,7 +34,9 @@ def get_stocks():
 def get_news():
     db: Session = next(get_db())
     try:
-        news = get_latest_news(db)
+        symbol = request.args.get('symbol') 
+        
+        news = get_latest_news(db, symbol=symbol) 
         return jsonify(news)
     finally:
         db.close()

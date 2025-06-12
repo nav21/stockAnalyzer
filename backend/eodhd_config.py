@@ -8,12 +8,12 @@ load_dotenv()
 EODHD_API_KEY = os.getenv('EODHD_API_KEY')
 BASE_URL = 'https://eodhd.com/api/news'
 
-def get_apple_news():
+def get_news(symbol: str):
     """Fetch news about Apple from EODHD."""
     try:
         params = {
             'api_token': EODHD_API_KEY,
-            's': 'AAPL.US',  # Apple stock symbol
+            's': symbol,  # Apple stock symbol
             'limit': 5,      # Get top 5 most relevant news
             'offset': 0
         }
