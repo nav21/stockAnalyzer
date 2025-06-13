@@ -56,6 +56,7 @@ def get_stock_analysis(question, stock_data, news_data):
 
             try:
                 current_timestamp = datetime.fromisoformat(price_record['timestamp'])
+                formatted_timestamp = current_timestamp.strftime('%Y-%m-%d %H:%M:%S')
                 current_date_str = current_timestamp.strftime('%Y-%m-%d')
                 
                 # Update oldest and newest dates
@@ -64,7 +65,7 @@ def get_stock_analysis(question, stock_data, news_data):
                 if newest_date_str is None or current_date_str > newest_date_str:
                     newest_date_str = current_date_str
 
-                stock_prices_detail.append(f"  Price: ${price_record['price']:.2f} (As of: {price_record['timestamp']})")
+                stock_prices_detail.append(f"  Price: ${price_record['price']:.2f} (As of: {formatted_timestamp})")
             except ValueError:
                 stock_prices_detail.append(f"  Price: ${price_record.get('price', 'N/A'):.2f} (As of: Invalid Date)")
 

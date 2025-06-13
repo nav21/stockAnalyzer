@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Session
 from config import SessionLocal
 import models
-from alpha_vantage_config import get_stock_price
+from eodhd_price_config import get_stock_price
 
-#STOCK_SYMBOLS = ['AAPL', 'AMZN', 'GOOGL', 'MSFT', 'TSLA']
-STOCK_SYMBOLS = ['AAPL']
+STOCK_SYMBOLS = ['AAPL', 'AMZN', 'GOOGL', 'MSFT', 'TSLA']
+#STOCK_SYMBOLS = ['AAPL']
 
 def update_stock_prices():
     """Fetch and update stock prices for all tracked symbols."""
@@ -39,42 +39,43 @@ def update_stock_prices():
     finally:
         db.close()
 
-def get_latest_prices(db: Session):
+def get_latest_prices(db: Session, symbol: str = None):
     """Get the latest price for each stock symbol."""
+
+    target_symbol = (symbol.upper() if symbol else 'AAPL') 
+
     latest_prices = {}
-    for symbol in STOCK_SYMBOLS:
-        stock = db.query(models.Stock)\
-            .filter(models.Stock.symbol == symbol)\
-            .order_by(models.Stock.timestamp.desc())\
-            .first()
-        if stock:
-            latest_prices[symbol] = {
-                'price': stock.price,
-                'timestamp': stock.timestamp.isoformat()
+    stock = db.query(models.Stock)\
+        .filter(models.Stock.symbol == target_symbol)\
+        .order_by(models.Stock.timestamp.desc())\
+        .first()
+    if stock:
+        latest_prices[target_symbol] = {
+            'price': stock.price,
+            'timestamp': stock.timestamp.isoformat()
             }
     return latest_prices 
 
-def get_latest_ten_prices(db: Session):
+def get_latest_ten_prices(db: Session, symbol: str = None):
     """Get the latest price for each stock symbol."""
-    latest_prices = {}
-    for symbol in STOCK_SYMBOLS:
-        # Query for the latest 10 stock records for the current symbol
-        stocks = db.query(models.Stock)\
-            .filter(models.Stock.symbol == symbol)\
-            .order_by(models.Stock.timestamp.desc())\
-            .limit(30)\
-            .all() # Execute the query and get all 10 results
+    all_latest_ten_prices = {}
+    
+    # Ensure only one symbol is processed: either the provided one or 'AAPL'
+    target_symbol = (symbol.upper() if symbol else 'AAPL') 
 
-        # Initialize a list to store the formatted prices for the current symbol
-        symbol_prices = []
-        for stock in stocks:
-            # Append each stock record as a dictionary to the list
-            symbol_prices.append({
-                'price': stock.price,
-                'timestamp': stock.timestamp.isoformat()
-            })
-        
-        # Assign the list of prices (symbol_prices) to the symbol in the latest_prices dictionary
-        latest_prices[symbol] = symbol_prices
+    # Simplified query to get the latest 10 records
+    stocks = db.query(models.Stock)\
+        .filter(models.Stock.symbol == target_symbol)\
+        .order_by(models.Stock.timestamp.desc())\
+        .limit(10)\
+        .all()
+
+    symbol_prices = []
+    for stock in stocks:
+        symbol_prices.append({
+            'price': stock.price,
+            'timestamp': stock.timestamp.isoformat()
+        })
+    all_latest_ten_prices[target_symbol] = symbol_prices
             
-    return latest_prices
+    return all_latest_ten_prices

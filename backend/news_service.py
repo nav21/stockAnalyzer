@@ -4,7 +4,7 @@ import models
 from eodhd_config import get_news
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError
-NEWS_SYMBOLS = ['AAPL'] # Example: Update news for Apple, Google, Microsoft
+NEWS_SYMBOLS = ['AAPL', 'AMZN', 'GOOGL', 'MSFT', 'TSLA'] # Example: Update news for Apple, Google, Microsoft
 
 def update_news():
     """
@@ -31,6 +31,8 @@ def update_news():
 
                 for item in news_items:
                     try:
+                        extracted_symbols = item.get('symbols', [])
+                        print(f"DEBUG: Processing news item for '{symbol}'. Article Title: '{item.get('title', 'N/A')}', Extracted Symbols: {extracted_symbols}")
                         # Check if news with this title already exists for the same symbol
                         # (Consider adding symbol to news model if you need news specific to symbol)
                         existing_news = db.query(models.News).filter(
@@ -90,10 +92,14 @@ def update_news():
 
 def get_latest_news(db: Session, symbol: str):
     """Get the latest news items."""
+    query = db.query(models.News) # <--- FIX: Initialize query with db.query()
+
     if symbol:
-        # Filter where the 'symbols' array column contains the specified symbol.
-        # This requires the 'symbols' column to be an actual ARRAY type in PostgreSQL.
-        query = query.filter(models.News.symbols.any(symbol.upper())) # Ensure symbol is upper case if API returns them that way
+        symbol_for_query = symbol.upper()
+        if not symbol_for_query.endswith('.US'):
+            symbol_for_query = f"{symbol_for_query}.US"
+        query = query.filter(models.News.symbols.any(symbol_for_query)) # <--- Changed line here
+
 
     news = query.order_by(models.News.timestamp.desc())\
                 .limit(5)\
