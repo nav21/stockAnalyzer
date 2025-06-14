@@ -16,8 +16,12 @@ function App() {
   const [showData, setShowData] = useState(false);
   // State for selected stock symbol
   const [selectedSymbol, setSelectedSymbol] = useState('AAPL.US'); 
+  const [userTimezone, setUserTimezone] = useState(''); 
+
 
   useEffect(() => {
+    setUserTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone);
+
     fetchStocks(selectedSymbol); 
     fetchNews(selectedSymbol); 
 
@@ -30,20 +34,19 @@ function App() {
       clearInterval(stockInterval);
       clearInterval(newsInterval);
     };
-  }, [selectedSymbol, questionsBySymbol, analysisBySymbol]); // Re-run effect when selectedSymbol changes
+  }, [selectedSymbol, questionsBySymbol, analysisBySymbol]); 
 
-  const fetchStocks = async (symbol) => { // Now accepts a symbol parameter
+  const fetchStocks = async (symbol) => {
     try {
-      // Fetch only the selected stock's price
       const response = await axios.get(`http://localhost:5000/api/stocks?symbol=${symbol}`);
-      setStocks(response.data); // Should receive something like {'AAPL': {'price': X, 'timestamp': Y}}
+      setStocks(response.data); 
     } catch (error) {
       console.error('Error fetching stocks:', error);
-      setStocks({}); // Clear stocks on error
+      setStocks({}); 
     }
   };
 
-  const fetchNews = async (symbol) => { // Now accepts a symbol parameter
+  const fetchNews = async (symbol) => { 
     try {
       const response = await axios.get(`http://localhost:5000/api/news?symbol=${symbol}`); 
       setNews(response.data);
@@ -60,11 +63,12 @@ function App() {
     try {
       const response = await axios.post('http://localhost:5000/api/analyze', {
         question: currentQuestion,
-        selectedSymbol: selectedSymbol // <--- Pass the selected symbol to the backend for analysis
+        selectedSymbol: selectedSymbol, 
+        userTimezone: userTimezone 
       });
 
       const newAnalysisResult = response.data.analysis;
-      setCurrentAnalysis(newAnalysisResult); // Update displayed analysis
+      setCurrentAnalysis(newAnalysisResult); 
 
       setQuestionsBySymbol(prevMap => new Map(prevMap).set(selectedSymbol, currentQuestion));
       setAnalysisBySymbol(prevMap => new Map(prevMap).set(selectedSymbol, newAnalysisResult));
@@ -91,12 +95,9 @@ function App() {
   const handleSymbolChange = (event) => {
     const newSymbol = event.target.value;
 
-    const oldSymbol = selectedSymbol; // Capture the symbol BEFORE it changes
+    const oldSymbol = selectedSymbol;
 
-    // Save the current question (typed or submitted) for the old symbol
     setQuestionsBySymbol(prevMap => new Map(prevMap).set(oldSymbol, currentQuestion));
-    // Also save the current analysis result for the old symbol (if it's not empty)
-    // This ensures submitted analysis also persists
     if (currentAnalysis) {
         setAnalysisBySymbol(prevMap => new Map(prevMap).set(oldSymbol, currentAnalysis));
     }
@@ -113,11 +114,9 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        {/* Title changed to "Stockalyzer" and kept the class for styling */}
         <h1 className="app-title">Stockalyzer</h1> 
         
-        <div className="header-controls"> {/* New div to group controls */}
-          {/* Stock Selector Dropdown - Now on the left */}
+        <div className="header-controls"> 
           <select 
             className="stock-selector"
             value={selectedSymbol}
@@ -129,10 +128,8 @@ function App() {
             <option value="AMZN">Amazon</option>
             <option value="GOOGL">Google</option>
           </select>
-
-          {/* Show Data Button - Now on the right and styled with new class */}
           <button 
-            className="hollow-button" /* Changed class to hollow-button */
+            className="hollow-button" 
             onClick={() => setShowData(!showData)}
           >
             {showData ? 'Hide Data' : 'Show Data'}
@@ -142,9 +139,8 @@ function App() {
         {showData && (
           <>
             <div className="stocks-container">
-              <h2>Stock Price for {selectedSymbol}</h2> {/* Updated title */}
+              <h2>Stock Price for {selectedSymbol}</h2>
               <div className="stocks-grid">
-                {/* Now display only the selected stock's price */}
                 {stocks[selectedSymbol] ? (
                   <div key={selectedSymbol} className="stock-card">
                     <h3>{selectedSymbol}</h3>
@@ -158,14 +154,12 @@ function App() {
             </div>
 
             <div className="news-container">
-              {/* News title now reflects the selected symbol */}
               <h2>Latest News for {selectedSymbol}</h2> 
               <div className="news-list">
                 {news.map((item, index) => (
                   <div key={index} className="news-card">
                     <h3>{item.title}</h3>
                     <div className="news-footer">
-                      {/* Removed sentiment badge as it was previously removed, kept symbols if present */}
                       {item.symbols && Array.isArray(item.symbols) && item.symbols.length > 0 && (
                         <span className="news-symbols">
                           Symbols: {item.symbols.join(', ')}
@@ -191,7 +185,6 @@ function App() {
         )}
 
         <div className="analysis-container">
-          {/* Analysis title now reflects the selected symbol */}
           <h2>Ask About {selectedSymbol}'s Stock</h2> 
           <form onSubmit={handleQuestionSubmit} className="question-form">
             <input

@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, Text, UniqueConstraint
 from config import Base
 from datetime import datetime
-from sqlalchemy.dialects.postgresql import ARRAY # Import ARRAY for PostgreSQL array type
+from sqlalchemy.dialects.postgresql import ARRAY 
 
 
 class Stock(Base):
@@ -20,4 +20,4 @@ class News(Base):
     content = Column(Text)
     url = Column(String)
     timestamp = Column(DateTime, default=datetime.utcnow) 
-    symbols = Column(ARRAY(String), index=True) # Stores a list of symbols
+    symbols = Column(ARRAY(String), index=True)
