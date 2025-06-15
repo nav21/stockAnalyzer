@@ -1,4 +1,4 @@
-# Stock Analyzer
+# InsightFlow
 
 This full-stack application can analyze news headlines and their impact on various stocks.
 
